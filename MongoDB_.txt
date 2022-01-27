@@ -1,0 +1,37 @@
+------------------------code-----------------------------------------
+show databases
+ use coviddatbase(its name of  the database)
+show collections (shows all the tables) 
+db.covidtable.count() #gives no of rows
+db.covidtable.find()
+db.covidtable.find({"Location.Continent":"Asia"}) #all rows with asia comes 
+db.covidtable.find({},{'Location.Continent':1,'_id':0}) # get all the continents in db and remove the objectid which is by fault
+db.covidtable.find({},{'Location.Continent':1}) only continent comes
+db.covidtable.find({"Data.Cases":{$gt:60}}) -if u write data.cases its case sensitive
+ db.covidtable.find({$or: [{'Location.Country':'India'},{'Location.Country':'America'}]},{'Data.Cases':1})
+db.covidtable.find( { "Data.Cases": { $not: { $gt: 100.0 } } } )
+db.covidtable.find().sort({'Data.Cases':1}) #ascending order use 1 desc means use -1
+
+
+db.covidtable.aggregate([{"$group":{_id:"$Location.Continent",counter:{$sum:1}}}]);
+db.covidtable.aggregate([{$group:{_id:'1',avgdeaths: {$avg: "$Location.Deaths"}}}])
+
+db.covidtable.aggregate([{$group: {_id:"$Location.Continent",AverageDeaths:{$avg:'$Location.Deaths'}}}])
+
+1. db.covidtable.aggregate( [{$group:{_id: "$Location.Continent",distinctValues:{ $addToSet:"$Location.Country"}}},{$unwind:"$distinctValues"} ,    {$group:{_id:"$_id",countrycount:{$sum:1}}},{$sort:{countrycount:-1}}])
+
+
+2. db.covidtable.aggregate( [{$group:{_id: "$Location.Country",max:{$max: "$Data.Cases"} }},{$sort:{max:-1}},{$limit:1}])
+3. db.covidtable.aggregate( [{$group:{_id: "$Location.Continent",avg:{$avg: "$Data.Deaths"}} },{$sort:{avg:-1}}])
+4. db.covidtable.aggregate( [{$group:{_id: "$Date.Month",sum:{$sum: "$Data.Deaths"} }},{$sort:{sum:-1}},{$limit:1}])
+
+
+db.covidtable.aggregate( [{$group:{_id: "$Date.Month",sum:{$sum: "$Data.Deaths"} }},{$sort:{sum:-1}},{$limit:1}])
+
+db.covidtable.aggregate( [{$group:{_id: "$Location.Continent",distinctValues:{$addToSet:"$Location.Country"} }},{$count:{distinctValues:1}])
+db.covidtable.aggregate([{$group: {_id:"$Location.Continent",AverageDeaths:{$avg:'$Location.Deaths'},count:{$sum:1}}}])
+db.covidtable.aggregate([{$group: {_id:"$Location.Deaths",count:{$max:1}}}])
+
+
+db.covidtable.aggregate( [{$group:{_id: "$Location.Continent",distinctValues:{ $addToSet:"$Location.Country"}}},     {$group:{_id:"$_id",countrycount:{$sum:1}}}])
+
